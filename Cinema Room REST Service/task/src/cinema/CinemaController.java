@@ -5,25 +5,24 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RestController
 public class CinemaController {
 
-    private Cinema cinema = new Cinema(9, 9);
+    private SeatService seatService = new SeatService();
 
     @GetMapping("/seats")
     public ResponseEntity<HashMap<String, Object>> getAvailableSeats(){
         HashMap<String, Object> result = new HashMap<>();
-        result.put("total_rows", cinema.getRows());
-        result.put("total_columns", cinema.getColumns());
-        result.put("available_seats", cinema.getAvailableSeats());
+        result.put("total_rows", seatService.getCinema().getRows());
+        result.put("total_columns", seatService.getCinema().getColumns());
+        result.put("available_seats", seatService.getAvailableSeats());
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @PostMapping("/return")
     public ResponseEntity<Map<String, Object>> refundTicket(@RequestBody Map<String, String> token){
-        Optional<Seat> seat = cinema.getSeats()
+        Optional<Seat> seat = seatService.getSeats()
                 .stream()
                 .filter( s -> s.getToken().equals(UUID.fromString(token.get("token"))))
                 .findAny();
@@ -37,7 +36,7 @@ public class CinemaController {
 
     @PostMapping("/purchase")
     public ResponseEntity<Map<String, Object>> purchaseTicket(@RequestBody Seat body){
-        Optional<Seat> seat = cinema.getSeats()
+        Optional<Seat> seat = seatService.getSeats()
                 .stream()
                 .filter( s -> s.getRow() == body.getRow() && s.getColumn() == body.getColumn())
                 .findAny();
@@ -67,10 +66,9 @@ public class CinemaController {
             return new ResponseEntity<>(Map.of("error", "The password is wrong!"), HttpStatus.UNAUTHORIZED);
         }
         HashMap<String, Object> result = new HashMap<>();
-        List<Seat> notAvailableSeats = cinema.getSeats().stream().filter(seat -> !seat.isAvailable()).collect(Collectors.toList());
-        result.put("current_income", notAvailableSeats.stream().mapToInt(Seat::getPrice).sum());
-        result.put("number_of_available_seats", cinema.getAvailableSeats().size());
-        result.put("number_of_purchased_tickets", notAvailableSeats.size());
+        result.put("current_income", seatService.getUnvailableSeats().stream().mapToInt(Seat::getPrice).sum());
+        result.put("number_of_available_seats", seatService.getAvailableSeats().size());
+        result.put("number_of_purchased_tickets", seatService.getUnvailableSeats().size());
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 

@@ -2,7 +2,6 @@ package cinema;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import java.util.Objects;
 import java.util.UUID;
 
 public class Seat {
@@ -12,7 +11,6 @@ public class Seat {
     private int price;
     private boolean isAvailable;
     private UUID token;
-    private boolean isPurchased;
 
     public Seat(){};
 

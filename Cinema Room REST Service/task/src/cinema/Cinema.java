@@ -1,9 +1,7 @@
 package cinema;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Cinema {
 
@@ -47,10 +45,6 @@ public class Cinema {
 
     public void setSeats(List<Seat> seats) {
         this.seats = seats;
-    }
-
-    public List<Seat> getAvailableSeats() {
-        return getSeats().stream().filter(Seat::isAvailable).collect(Collectors.toList());
     }
 
     @Override
